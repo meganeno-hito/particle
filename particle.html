@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Particle Trail Effect</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #000;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particleCanvas"></canvas>
+  <script>
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let particles = [];
+    const particleCount = 20; // 軌跡のパーティクル数
+    const particleSize = 3;   // パーティクルのサイズ
+
+// パーティクルのクラス
+class Particle {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.size = Math.random() * particleSize + 1;
+    this.speedX = Math.random() * 2 - 1;
+    this.speedY = Math.random() * 2 - 1;
+    this.color = '#e0f2f7'; // 淡い青色に設定
+  }
+  // パーティクルを更新
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    if (this.size > 0.2) this.size -= 0.1;
+  }
+  // パーティクルを描画
+  draw() {
+    ctx.beginPath();
+    // 影の設定（つや感のため）
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+    ctx.fillStyle = this.color;
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+    // 影をリセット
+    ctx.shadowBlur = 0;
+  }
+}
+
+    // パーティクルを生成
+    function createParticle(x, y) {
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle(x, y));
+      }
+    }
+
+    // アニメーションループ
+    function animate() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+      }
+      // サイズが0.2以下のパーティクルを削除
+      particles = particles.filter(particle => particle.size > 0.2);
+
+      requestAnimationFrame(animate);
+    }
+    
+    // マウスの動きを検知
+    canvas.addEventListener('mousemove', (event) => {
+      createParticle(event.clientX, event.clientY);
+    });
+
+    // ウィンドウサイズ変更時の処理
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    animate();
+  </script>
+</body>
+</html>
